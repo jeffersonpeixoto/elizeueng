@@ -1,0 +1,165 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chamados de Engenharia</title>
+  <meta name="theme-color" content="#0b2a59" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Lista de Chamados de Engenharia</h1>
+      <p id="statusConexao">Carregando...</p>
+    </div>
+
+    <div class="acoes-topo">
+      <button id="btnNovoChamado">Novo chamado</button>
+      <button id="btnInstalar" class="secundario oculto">Instalar app</button>
+      <button id="btnPermissaoNotificacao" class="secundario">Ativar notificações</button>
+    </div>
+  </header>
+
+  <section class="filtros">
+    <input type="text" id="busca" placeholder="Buscar por ID, problema, solicitante ou unidade" />
+
+    <select id="filtroStatus">
+      <option value="">Todos os status</option>
+      <option value="Aberto">Aberto</option>
+      <option value="Em andamento">Em andamento</option>
+      <option value="Concluído">Concluído</option>
+    </select>
+
+    <select id="filtroSetor">
+      <option value="">Todos os setores</option>
+      <option value="Predial">Predial</option>
+      <option value="Metalúrgica">Metalúrgica</option>
+      <option value="Elétrica">Elétrica</option>
+    </select>
+  </section>
+
+  <main class="conteudo">
+    <div id="listaChamados" class="grid"></div>
+  </main>
+
+  <div id="modalDetalhes" class="modal oculto">
+    <div class="modal-conteudo">
+      <div class="modal-topo">
+        <h2>Detalhes do chamado</h2>
+        <button id="fecharModalDetalhes" class="secundario">Fechar</button>
+      </div>
+      <div id="detalhesChamado"></div>
+    </div>
+  </div>
+
+  <div id="modalFormulario" class="modal oculto">
+    <div class="modal-conteudo largo">
+      <div class="modal-topo">
+        <h2 id="tituloFormulario">Novo chamado</h2>
+        <button id="fecharModalFormulario" class="secundario">Fechar</button>
+      </div>
+
+      <form id="formChamado" class="formulario">
+        <input type="hidden" id="chamadoId" />
+
+        <div class="grid-form">
+          <label>
+            <span>ID do chamado (opcional)</span>
+            <input type="text" id="idManual" placeholder="Deixe vazio para gerar automático" />
+          </label>
+
+          <label><span>Solicitante</span><input type="text" id="solicitante" required /></label>
+          <label><span>Unidade</span><input type="text" id="unidade" required /></label>
+          <label><span>Setor</span><input type="text" id="setor" required /></label>
+          <label><span>Problema</span><input type="text" id="problema" required /></label>
+          <label><span>Manutenção</span><input type="text" id="manutencao" required /></label>
+
+          <label>
+            <span>Prioridade</span>
+            <select id="prioridade" required>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+              <option value="Crítica">Crítica</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Status</span>
+            <select id="status" required>
+              <option value="Aberto">Aberto</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Concluído">Concluído</option>
+            </select>
+          </label>
+
+          <label><span>Equipe</span><select id="equipeId" required></select></label>
+          <label><span>Criação</span><input type="datetime-local" id="criacao" required /></label>
+          <label><span>Início</span><input type="datetime-local" id="inicio" /></label>
+          <label><span>Finalização</span><input type="datetime-local" id="finalizacao" /></label>
+        </div>
+
+        <label class="bloco">
+          <span>Observação</span>
+          <textarea id="observacao" rows="3"></textarea>
+        </label>
+
+        <div class="subtopo-itens">
+          <h3>Itens do chamado</h3>
+          <button type="button" id="btnAdicionarItem">Adicionar item</button>
+        </div>
+
+        <div class="tabela-responsiva">
+          <table>
+            <thead>
+              <tr>
+                <th>Serviço</th>
+                <th>Cargo</th>
+                <th>Qtd</th>
+                <th>Horas</th>
+                <th>Valor/Hora</th>
+                <th>Valor</th>
+                <th>Obs.</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="listaItensForm"></tbody>
+            <tfoot>
+              <tr>
+                <td colspan="5">TOTAL</td>
+                <td id="totalFormulario">R$ 0,00</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="acoes-form">
+          <button type="submit">Salvar chamado</button>
+          <button type="button" id="btnCancelarFormulario" class="secundario">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <template id="templateLinhaItem">
+    <tr class="linha-item">
+      <td><input type="text" class="item-servico" placeholder="Descrição do serviço" required /></td>
+      <td><select class="item-cargo" required></select></td>
+      <td><input type="number" class="item-quantidade" min="0" step="0.01" value="1" required /></td>
+      <td><input type="number" class="item-horas" min="0" step="0.01" value="0" required /></td>
+      <td class="item-valor-hora">R$ 0,00</td>
+      <td class="item-valor-total">R$ 0,00</td>
+      <td><input type="text" class="item-observacao" placeholder="Observação" /></td>
+      <td><button type="button" class="perigo item-remover">Remover</button></td>
+    </tr>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/supabase.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
